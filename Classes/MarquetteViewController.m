@@ -17,17 +17,11 @@
 @synthesize hostField;
 @synthesize connectButton;
 
-
-/*
-// The designated initializer. Override to perform setup that is required before the view is loaded.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    NSLog(@"View Did Load");
+    MarquetteAppDelegate *myAppDelegate = (MarquetteAppDelegate *)[UIApplication sharedApplication].delegate;
+    [myAppDelegate.mosquittoClient setDelegate:self];
 }
-*/
 
 /*
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
@@ -36,12 +30,15 @@
 */
 
 
-/*
+
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
+    NSLog(@"View Did Load");
+    MarquetteAppDelegate *myAppDelegate = (MarquetteAppDelegate *)[UIApplication sharedApplication].delegate;
+    [myAppDelegate.mosquittoClient setDelegate:self];
     [super viewDidLoad];
 }
-*/
+
 
 
 /*
@@ -104,6 +101,7 @@
 }
 
 - (void) didConnect:(NSUInteger)code {
+    NSLog(@"didConnect");
 	[[self connectButton] setTitle:@"Reconnect" forState:UIControlStateNormal];
 }
 
@@ -111,28 +109,36 @@
 	[[self connectButton] setTitle:@"Connect" forState:UIControlStateNormal];
 }
 
-- (void) didReceiveMessage: (NSString*)message topic:(NSString*)topic {
-	NSLog(@"%@ => %@", topic, message);
+- (void) didReceiveMessage: (MosquittoMessage *)message {
+	NSLog(@"ReceivedMessage: %@ => %@", [message topic], [message payload]);
 
 	UISwitch *sw = nil;
-	if ([topic isEqualToString:@"nanode/red_led"]) {
+	if ([[message topic] isEqualToString:@"nanode/red_led"]) {
 		sw = redLedSwitch;
-	} else if ([topic isEqualToString:@"nanode/green_led"]) {
+	} else if ([[message topic] isEqualToString:@"nanode/green_led"]) {
 		sw = greenLedSwitch;
 	} else {
 		return;
 	}
 
-	if ([message isEqualToString:@"1"]) {
+	if ([[message payload] isEqualToString:@"1"]) {
 		[sw setOn: YES];
-	} else if ([message isEqualToString:@"0"]) {
+	} else if ([[message payload] isEqualToString:@"0"]) {
 		[sw setOn: NO];
 	}
 }
 
-- (void) didPublish: (NSUInteger)messageId {}
-- (void) didSubscribe: (NSUInteger)messageId grantedQos:(NSArray*)qos {}
-- (void) didUnsubscribe: (NSUInteger)messageId {}
+- (void) didPublish: (NSUInteger)messageId {
+    NSLog(@"didPublish");
+}
+
+- (void) didSubscribe: (NSUInteger)messageId grantedQos:(NSArray*)qos {
+    NSLog(@"didSubscribe");
+}
+
+- (void) didUnsubscribe: (NSUInteger)messageId {
+    NSLog(@"didUbsubscribe");
+}
 
 - (void)dealloc {
     [super dealloc];

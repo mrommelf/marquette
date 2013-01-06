@@ -26,20 +26,11 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
 
-	// Set the view controller as the window's root view controller and display.
-    self.window.rootViewController = self.viewController;
-    [self.window makeKeyAndVisible];
-
 	// FIXME: is sending out the MAC address a security issue?
 	NSString *clientId = [NSString stringWithFormat:@"marquette_%@", getMacAddress()];
 	NSLog(@"Client ID: %@", clientId);
     mosquittoClient = [[MosquittoClient alloc] initWithClientId:clientId];
 	// FIXME: deal with failed inits
-
-	// FIXME: only if compiled in debug mode?
-	[mosquittoClient setLogPriorities:MOSQ_LOG_ALL destinations:MOSQ_LOG_STDERR];
-	[mosquittoClient setDelegate: self.viewController];
-
     return YES;
 }
 
